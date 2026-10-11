@@ -1,0 +1,10 @@
+# ---- 本地验收截图（体积较大，仅用于本地检查，不入库）----
+preview/*.png
+
+# ---- 系统与编辑器产生的临时文件 ----
+Thumbs.db
+Desktop.ini
+.DS_Store
+*.log
+*.tmp
+__pycache__/
