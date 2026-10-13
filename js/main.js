@@ -122,7 +122,11 @@
         if (json.ok) { form.reset(); }
       })
       .catch(function () {
-        setFormNote(form, "当前为本地预览模式：正式上线后此表单会自动把询盘发送到企业邮箱。如需尽快联系，请致电 18198482880。", false);
+        var isDemo = /\.github\.io$/i.test(location.hostname);
+        var tip = isDemo
+          ? "这里是在线演示版，表单暂不发送邮件；正式上线后询盘会直接送到企业邮箱。如需尽快联系，请致电 18198482880。"
+          : "暂时无法发送，请稍后重试，或直接致电 18198482880。";
+        setFormNote(form, tip, false);
       })
       .finally(function () {
         if (btn) { btn.disabled = false; btn.textContent = "提交需求"; }
