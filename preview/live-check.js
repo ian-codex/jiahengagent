@@ -1,0 +1,20 @@
+const { chromium } = require(process.argv[4]);
+(async () => {
+  const url = process.argv[2];
+  const out = process.argv[3];
+  const browser = await chromium.launch({ channel: 'msedge' });
+  const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+  const errors = [];
+  page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
+  page.on('pageerror', e => errors.push('pageerror: ' + e.message));
+  const bad = [];
+  page.on('response', r => { if (r.status() >= 400) bad.push(r.status() + ' ' + r.url()); });
+  await page.goto(url, { waitUntil: 'load', timeout: 60000 });
+  await page.waitForTimeout(2500);
+  await page.screenshot({ path: out, fullPage: false });
+  const imgs = await page.$$eval('img', els => els.map(e => ({ src: e.src, ok: e.complete && e.naturalWidth > 0 })));
+  const badImg = imgs.filter(i => !i.ok).map(i => i.src);
+  const title = await page.title();
+  console.log(JSON.stringify({ title, consoleErrors: errors, badResponses: bad, imgTotal: imgs.length, brokenImgs: badImg }, null, 2));
+  await browser.close();
+})();
